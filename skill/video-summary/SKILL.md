@@ -1,16 +1,17 @@
 ---
 name: video-summary
-description: Summarize tutorial, commentary, strategy, lecture, and long-form spoken videos by extracting audio, transcribing locally with Whisper, then organizing the result into concise notes, pocket cards, or structured summaries. Use when the user sends a Bilibili video link, local audio/video file, or asks to summarize spoken video content from links.
+description: Summarize tutorial, commentary, strategy, lecture, and long-form spoken videos by extracting audio, transcribing locally with Whisper, then organizing the result into concise notes, pocket cards, or structured summaries. Use when the user sends a Bilibili video link, local audio file, local video file, or asks to summarize spoken video content from links/files.
 ---
 
 # Video Summary
 
 Default workflow:
 1. If input is a Bilibili link, run `scripts/video_transcribe.py` to fetch audio and transcribe locally.
-2. If input is a local audio file, transcribe it directly.
-3. Read the generated `.txt` transcript.
-4. Use the generated `*-summary-template.md` as the working skeleton.
-5. Produce the format the user asked for:
+2. If input is a local video file, extract audio first, then transcribe locally.
+3. If input is a local audio file, transcribe it directly.
+4. Read the generated `.txt` transcript.
+5. Use the generated `*-summary-template.md` as the working skeleton.
+6. Produce the format the user asked for:
    - normal summary
    - pocket card / cheat sheet
    - chapter summary
@@ -30,21 +31,23 @@ Prefer:
 Use:
 - `scripts/video_transcribe.py`
 
-Example:
+Examples:
 
 ```bash
 python3 scripts/video_transcribe.py "https://www.bilibili.com/video/BVxxxx" --name my-video
+python3 scripts/video_transcribe.py "/path/to/video.mp4" --name my-local-video
+python3 scripts/video_transcribe.py "/path/to/audio.m4a" --name my-audio
 ```
 
 Output files land in `output/` by default:
-- `my-video.m4a`
-- `my-video.txt`
-- `my-video.srt`
-- `my-video.vtt`
-- `my-video-summary-template.md`
+- `*.m4a`
+- `*.txt`
+- `*.srt`
+- `*.vtt`
+- `*-summary-template.md`
 
 ## Limits
 
-- Current script is stabilized first for Bilibili links.
+- Current script is stabilized first for Bilibili links and local files.
 - For pure visual videos with little speech, transcript-only summaries may miss screen-only information.
 - If transcript quality is noisy, summarize conservatively and say so.

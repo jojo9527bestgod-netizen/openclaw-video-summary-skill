@@ -4,21 +4,35 @@
 
 ## 包含内容
 
-- `scripts/video_transcribe.py`：抓取 B 站音频并调用本地 Whisper 转写
+- `scripts/video_transcribe.py`：支持 B 站链接、本地音频、本地视频
 - `skill/video-summary/`：供 Agent 使用的 skill
 
 ## 用法
+
+### B站链接
 
 ```bash
 python3 scripts/video_transcribe.py "https://www.bilibili.com/video/BV1GWPiz7EKi/" --name my-video
 ```
 
+### 本地视频
+
+```bash
+python3 scripts/video_transcribe.py "/path/to/video.mp4" --name my-local-video
+```
+
+### 本地音频
+
+```bash
+python3 scripts/video_transcribe.py "/path/to/audio.m4a" --name my-audio
+```
+
 输出默认在 `output/`：
-- `my-video.m4a`
-- `my-video.txt`
-- `my-video.srt`
-- `my-video.vtt`
-- `my-video-summary-template.md`
+- `*.m4a`
+- `*.txt`
+- `*.srt`
+- `*.vtt`
+- `*-summary-template.md`
 
 ## 依赖
 
@@ -28,6 +42,9 @@ python3 scripts/video_transcribe.py "https://www.bilibili.com/video/BV1GWPiz7EKi
 
 ## 说明
 
-当前脚本先稳定支持 Bilibili 链接与本地音频文件。
-现在会在转写完成后自动生成一个 Markdown 摘要模板，方便后续快速整理成摘要、口袋卡片或 Word 版内容。
-后续可继续扩展 YouTube / 本地视频抽音频 / 自动生成初版摘要。
+当前脚本已稳定支持：
+- Bilibili 链接
+- 本地音频文件
+- 本地视频文件（自动抽音频）
+
+后续计划再扩展 YouTube 下载与转写支持。

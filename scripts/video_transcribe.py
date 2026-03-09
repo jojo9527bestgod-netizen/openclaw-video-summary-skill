@@ -8,6 +8,8 @@ import urllib.request
 
 WORKDIR = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_OUT = WORKDIR / "output"
+VIDEO_EXTS = {".mp4", ".mov", ".mkv", ".avi", ".webm", ".m4v"}
+AUDIO_EXTS = {".m4a", ".mp3", ".wav", ".aac", ".flac", ".ogg"}
 
 SUMMARY_TEMPLATE = """# 视频总结模板
 
@@ -67,6 +69,14 @@ def fetch_bilibili_audio(url: str, out_audio: pathlib.Path) -> None:
         out_audio.write_bytes(r.read())
 
 
+def extract_audio_from_video(video_path: pathlib.Path, out_audio: pathlib.Path) -> None:
+    cmd = (
+        f'ffmpeg -y -i "{video_path}" -vn -acodec aac -b:a 192k '
+        f'"{out_audio}"'
+    )
+    subprocess.check_call(cmd, shell=True)
+
+
 def ensure_whisper_in_path() -> str:
     home_bin = pathlib.Path.home() / "Library/Python/3.9/bin"
     return f"{home_bin}:{pathlib.os.environ.get('PATH','')}"
@@ -96,8 +106,8 @@ def write_summary_template(out_dir: pathlib.Path, stem: str):
 
 
 def main():
-    p = argparse.ArgumentParser(description="抓取 B 站音频并用本地 Whisper 转写")
-    p.add_argument("input", help="B站视频链接，或本地音频文件路径")
+    p = argparse.ArgumentParser(description="抓取 B 站音频 / 提取本地视频音频，并用本地 Whisper 转写")
+    p.add_argument("input", help="B站视频链接、本地音频文件路径、或本地视频文件路径")
     p.add_argument("--name", default="video", help="输出文件前缀")
     p.add_argument("--outdir", default=str(DEFAULT_OUT), help="输出目录")
     p.add_argument("--model", default="base", help="Whisper 模型，默认 base")
@@ -117,7 +127,14 @@ def main():
         src = pathlib.Path(args.input).expanduser().resolve()
         if not src.exists():
             raise SystemExit(f"文件不存在: {src}")
-        audio_path = src
+        suffix = src.suffix.lower()
+        if suffix in VIDEO_EXTS:
+            print("[1/3] 从本地视频提取音频…")
+            extract_audio_from_video(src, audio_path)
+        elif suffix in AUDIO_EXTS:
+            audio_path = src
+        else:
+            raise SystemExit(f"暂不支持的本地文件类型: {suffix}")
 
     print(f"[2/3] 本地 Whisper 转写… -> {audio_path}")
     transcribe(audio_path, out_dir, args.model, args.language)

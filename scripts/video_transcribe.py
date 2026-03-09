@@ -69,6 +69,22 @@ def fetch_bilibili_audio(url: str, out_audio: pathlib.Path) -> None:
         out_audio.write_bytes(r.read())
 
 
+def fetch_youtube_audio(url: str, out_audio: pathlib.Path) -> None:
+    cmd = (
+        f'yt-dlp -x --audio-format m4a --no-playlist '
+        f'-o "{out_audio.with_suffix("%(ext)s")}" "{url}"'
+    )
+    subprocess.check_call(cmd, shell=True)
+    # yt-dlp 输出可能已是 .m4a，也可能按 ext 产物命名，这里做一次收拢
+    candidates = list(out_audio.parent.glob(out_audio.stem + '.*'))
+    for c in candidates:
+        if c.suffix.lower() in AUDIO_EXTS:
+            if c != out_audio:
+                c.replace(out_audio)
+            return
+    raise RuntimeError("YouTube 音频下载完成，但未找到输出音频文件")
+
+
 def extract_audio_from_video(video_path: pathlib.Path, out_audio: pathlib.Path) -> None:
     cmd = (
         f'ffmpeg -y -i "{video_path}" -vn -acodec aac -b:a 192k '
@@ -106,8 +122,8 @@ def write_summary_template(out_dir: pathlib.Path, stem: str):
 
 
 def main():
-    p = argparse.ArgumentParser(description="抓取 B 站音频 / 提取本地视频音频，并用本地 Whisper 转写")
-    p.add_argument("input", help="B站视频链接、本地音频文件路径、或本地视频文件路径")
+    p = argparse.ArgumentParser(description="抓取 B 站/YouTube 音频、提取本地视频音频，并用本地 Whisper 转写")
+    p.add_argument("input", help="B站链接、YouTube 链接、本地音频文件路径、或本地视频文件路径")
     p.add_argument("--name", default="video", help="输出文件前缀")
     p.add_argument("--outdir", default=str(DEFAULT_OUT), help="输出目录")
     p.add_argument("--model", default="base", help="Whisper 模型，默认 base")
@@ -119,10 +135,14 @@ def main():
     audio_path = out_dir / f"{args.name}.m4a"
 
     if args.input.startswith("http"):
-        if "bilibili.com/video/" not in args.input:
-            raise SystemExit("目前脚本先稳定支持 Bilibili 视频链接")
-        print("[1/3] 抓取 B 站音频…")
-        fetch_bilibili_audio(args.input, audio_path)
+        if "bilibili.com/video/" in args.input:
+            print("[1/3] 抓取 B 站音频…")
+            fetch_bilibili_audio(args.input, audio_path)
+        elif any(x in args.input for x in ["youtube.com/watch", "youtu.be/"]):
+            print("[1/3] 抓取 YouTube 音频…")
+            fetch_youtube_audio(args.input, audio_path)
+        else:
+            raise SystemExit("当前仅支持 Bilibili 与 YouTube 链接")
     else:
         src = pathlib.Path(args.input).expanduser().resolve()
         if not src.exists():

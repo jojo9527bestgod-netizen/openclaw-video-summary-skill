@@ -4,11 +4,51 @@ import json
 import pathlib
 import re
 import subprocess
-import sys
 import urllib.request
 
 WORKDIR = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_OUT = WORKDIR / "output"
+
+SUMMARY_TEMPLATE = """# 视频总结模板
+
+## 基本信息
+- 文件名：{name}
+- 音频：{audio}
+- 转写文本：{txt}
+- 字幕：{srt}
+
+## 一句话总结
+- 
+
+## 核心内容（3-5条）
+1. 
+2. 
+3. 
+
+## 章节/主题拆分
+### 1.
+- 
+
+### 2.
+- 
+
+### 3.
+- 
+
+## 可执行要点 / 清单
+- 
+- 
+- 
+
+## 适合输出格式
+- 普通摘要
+- 口袋卡片版
+- 分章节版
+- 按角色/对象版
+
+## 备注
+- 若转写噪音较大，先校正专有名词再总结。
+"""
 
 
 def run(cmd):
@@ -43,6 +83,18 @@ def transcribe(audio_path: pathlib.Path, out_dir: pathlib.Path, model: str, lang
     subprocess.check_call(cmd, shell=True)
 
 
+def write_summary_template(out_dir: pathlib.Path, stem: str):
+    audio = out_dir / f"{stem}.m4a"
+    txt = out_dir / f"{stem}.txt"
+    srt = out_dir / f"{stem}.srt"
+    md = out_dir / f"{stem}-summary-template.md"
+    md.write_text(
+        SUMMARY_TEMPLATE.format(name=stem, audio=audio.name, txt=txt.name, srt=srt.name),
+        encoding="utf-8",
+    )
+    return md
+
+
 def main():
     p = argparse.ArgumentParser(description="抓取 B 站音频并用本地 Whisper 转写")
     p.add_argument("input", help="B站视频链接，或本地音频文件路径")
@@ -59,7 +111,7 @@ def main():
     if args.input.startswith("http"):
         if "bilibili.com/video/" not in args.input:
             raise SystemExit("目前脚本先稳定支持 Bilibili 视频链接")
-        print("[1/2] 抓取 B 站音频…")
+        print("[1/3] 抓取 B 站音频…")
         fetch_bilibili_audio(args.input, audio_path)
     else:
         src = pathlib.Path(args.input).expanduser().resolve()
@@ -67,14 +119,17 @@ def main():
             raise SystemExit(f"文件不存在: {src}")
         audio_path = src
 
-    print(f"[2/2] 本地 Whisper 转写… -> {audio_path}")
+    print(f"[2/3] 本地 Whisper 转写… -> {audio_path}")
     transcribe(audio_path, out_dir, args.model, args.language)
+
+    print("[3/3] 生成摘要模板…")
+    md = write_summary_template(out_dir, audio_path.stem)
 
     txt = out_dir / f"{audio_path.stem}.txt"
     srt = out_dir / f"{audio_path.stem}.srt"
     vtt = out_dir / f"{audio_path.stem}.vtt"
     print("完成：")
-    for pth in [audio_path, txt, srt, vtt]:
+    for pth in [audio_path, txt, srt, vtt, md]:
         if pth.exists():
             print(pth)
 

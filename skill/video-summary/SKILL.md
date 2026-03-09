@@ -9,7 +9,8 @@ Default workflow:
 1. If input is a Bilibili link, run `scripts/video_transcribe.py` to fetch audio and transcribe locally.
 2. If input is a local audio file, transcribe it directly.
 3. Read the generated `.txt` transcript.
-4. Produce the format the user asked for:
+4. Use the generated `*-summary-template.md` as the working skeleton.
+5. Produce the format the user asked for:
    - normal summary
    - pocket card / cheat sheet
    - chapter summary
@@ -40,6 +41,7 @@ Output files land in `output/` by default:
 - `my-video.txt`
 - `my-video.srt`
 - `my-video.vtt`
+- `my-video-summary-template.md`
 
 ## Limits
 

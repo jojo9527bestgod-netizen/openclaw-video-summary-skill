@@ -18,6 +18,7 @@ python3 scripts/video_transcribe.py "https://www.bilibili.com/video/BV1GWPiz7EKi
 - `my-video.txt`
 - `my-video.srt`
 - `my-video.vtt`
+- `my-video-summary-template.md`
 
 ## 依赖
 
@@ -28,4 +29,5 @@ python3 scripts/video_transcribe.py "https://www.bilibili.com/video/BV1GWPiz7EKi
 ## 说明
 
 当前脚本先稳定支持 Bilibili 链接与本地音频文件。
-后续可继续扩展 YouTube / 本地视频抽音频 / 自动生成摘要模板。
+现在会在转写完成后自动生成一个 Markdown 摘要模板，方便后续快速整理成摘要、口袋卡片或 Word 版内容。
+后续可继续扩展 YouTube / 本地视频抽音频 / 自动生成初版摘要。

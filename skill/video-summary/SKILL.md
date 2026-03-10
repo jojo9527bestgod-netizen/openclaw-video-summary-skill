@@ -12,7 +12,8 @@ Default workflow:
 4. If input is a local audio file, transcribe it directly.
 5. Read the generated `.txt` transcript.
 6. Use the generated `*-summary-template.md` as the working skeleton.
-7. Produce the format the user asked for:
+7. Prefer using the installed `summarizer` skill/method to compress the transcript into a cleaner written summary.
+8. Produce the format the user asked for:
    - normal summary
    - short summary
    - pocket card / cheat sheet
@@ -51,3 +52,4 @@ Prefer:
 - For pure visual videos with little speech, transcript-only summaries may miss screen-only information.
 - If transcript quality is noisy, summarize conservatively and say so.
 - Bilibili audio extraction currently relies on page parsing and may need maintenance if page structure changes.
+- `summarize` may appear installed at skill level, but its CLI is not the default path on this Intel Mac because the upstream package is arm64-only here; prefer the `summarizer`-based summary step instead.

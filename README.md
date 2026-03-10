@@ -45,6 +45,14 @@
 - 按对象/角色整理
 - 操作清单版
 
+当前默认走法：
+- 使用已安装的 `summarizer` 思路/skill 对 transcript 做二次压缩总结
+- 再按需要整理成群聊版、口袋卡片版或 Word 版
+
+说明：
+- `summarize` 这个 skill 虽然已安装，但其底层 CLI 在当前 Intel Mac（x64）上不兼容，因此不作为默认主路
+- 当前主路是：Whisper 转写 → `summarizer` 风格文字总结 → 导出 Word（可选）
+
 ### 3. 最后导出 Word
 如果需要留档或发给别人，可以把整理后的 Markdown / TXT 导出为 `.docx`。
 

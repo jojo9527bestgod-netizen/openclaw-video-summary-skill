@@ -5,6 +5,10 @@ description: Summarize tutorial, commentary, strategy, lecture, and long-form sp
 
 # Video Summary
 
+Keep all skill-owned resources inside this folder.
+Use the bundled scripts under `scripts/` as the canonical implementation.
+The repository-root `scripts/` directory only exists as compatibility wrappers for direct CLI usage.
+
 Default workflow:
 1. If input is a Bilibili link, run `scripts/video_transcribe.py` to fetch audio and transcribe locally.
 2. If input is a YouTube link, use the same script to download audio via `yt-dlp`, then transcribe locally.

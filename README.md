@@ -26,9 +26,11 @@
 
 ## 包含内容
 
-- `scripts/video_transcribe.py`：支持 B 站链接、YouTube 链接、本地音频、本地视频
-- `scripts/export_docx.py`：把 Markdown/TXT 摘要正确导出为 docx（避免中文乱码）
-- `skill/video-summary/`：供 Agent 使用的 skill
+- `skill/video-summary/SKILL.md`：供 Agent 使用的 skill 说明
+- `skill/video-summary/scripts/video_transcribe.py`：skill 内部主脚本，支持 B 站链接、YouTube 链接、本地音频、本地视频
+- `skill/video-summary/scripts/export_docx.py`：skill 内部 docx 导出脚本
+- `scripts/video_transcribe.py`：仓库根目录兼容入口，转调到 skill 内部脚本
+- `scripts/export_docx.py`：仓库根目录兼容入口，转调到 skill 内部脚本
 
 ## 这套仓库现在能做什么
 
@@ -103,5 +105,9 @@ python3 scripts/export_docx.py output/my-video-summary-template.md --output ~/De
 - 生成总结模板
 - 做文字总结
 - 导出 Word
+
+同时，仓库结构也已向标准 skill 目录收拢：
+- `skill/video-summary/` 下面放 skill 自身说明与脚本
+- 仓库根目录 `scripts/` 只保留兼容入口，避免以后打包 skill 时路径混乱
 
 也就是说，它现在更接近一个完整的“视频总结底座”。

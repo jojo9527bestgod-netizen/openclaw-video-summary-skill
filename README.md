@@ -90,6 +90,12 @@ python3 scripts/video_transcribe.py "/path/to/audio.m4a" --name my-audio
 python3 scripts/export_docx.py output/my-video-summary-template.md --output ~/Desktop/my-video.docx
 ```
 
+**导出建议：**
+- 文件名建议使用视频标题，便于归档管理
+- 导出前建议先用总结模板整理内容，生成结构化的 Markdown
+- Word 排版支持标题、表格、列表等格式
+- 支持直接导出 TXT 或 Markdown 内容为 Word
+
 ## 依赖
 
 - ffmpeg

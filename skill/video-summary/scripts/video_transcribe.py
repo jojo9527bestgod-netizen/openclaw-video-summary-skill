@@ -71,9 +71,11 @@ def fetch_bilibili_audio(url: str, out_audio: pathlib.Path) -> None:
 
 
 def fetch_youtube_audio(url: str, out_audio: pathlib.Path) -> None:
+    # 用 .m4a 作为输出模板，让 yt-dlp 自动处理扩展名
+    out_template = out_audio.parent / f"{out_audio.stem}.%(ext)s"
     cmd = (
         f'yt-dlp -x --audio-format m4a --no-playlist '
-        f'-o "{out_audio.with_suffix("%(ext)s")}" "{url}"'
+        f'-o "{out_template}" "{url}"'
     )
     subprocess.check_call(cmd, shell=True)
     candidates = list(out_audio.parent.glob(out_audio.stem + '.*'))
